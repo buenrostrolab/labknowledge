@@ -124,24 +124,26 @@ $(document).ready(function () {
 </div>
 
 
-<div id="setting" class="section level2">
-<h2>Setting</h2>
-<p>Connecting to the BuenrostroLab workstation with a variety of tips and tricks via <code>ssh</code>. Throughout the document, I’ll use <code>LOCALUSERNAME</code> as the username that’s on the workstation and <code>BROADUSERNAME</code> as your username for the Broad (they may or may not be different in actuality).</p>
+<p><br> <br></p>
+<div id="document-goal" class="section level2">
+<h2>Document Goal</h2>
+<p>Describe how to connect to the BuenrostroLab workstation with a variety of tips and tricks via <code>ssh</code>. Throughout the document, I’ll use <code>LOCALUSERNAME</code> as the username that’s on the workstation and <code>BROADUSERNAME</code> as your username for the Broad (they may or may not be different in actuality). <br> <br> <br></p>
 </div>
 <div id="easy-obvious-way" class="section level2">
 <h2>Easy, obvious way</h2>
 <ul>
 <li>Connect to Broad VPN using your username/password (via <code>Cisco Anyconnect</code>, log into <code>vpn.broadinstitute.org</code>)</li>
 <li><p><code>ssh</code> into the workstation.</p>
-<pre><code>ssh LOCALUSERNAME@10.75.108.34</code></pre></li>
+<pre><code>ssh LOCALUSERNAME@10.75.108.34</code></pre>
+<p><br> <br></p></li>
 </ul>
 </div>
-<div id="accessing-rstudio" class="section level2">
-<h2>Accessing RStudio</h2>
+<div id="accessing-rstudio-w-vpn" class="section level2">
+<h2>Accessing RStudio w/ VPN</h2>
 <ul>
-<li><p>As far as I’ve been able to figure things out, to access RStudio, you have to be connected to the Broad VPN. Once you are connected, type the following in any web browser to access RStudio on the workstation:</p>
+<li><p>Once connected to the VPN, simply enter the following to connect to the workstation’s Rstudio server instance–</p>
 <pre><code>http://10.75.108.34:8787</code></pre></li>
-<li><p>What this means is that RStudio server is available through port <code>8787</code> at the designated IP address of the workstation.</p></li>
+<li><p>What this means is that RStudio server is available through port <code>8787</code> at the designated IP address of the workstation. <br> <br> <br></p></li>
 </ul>
 </div>
 <div id="ssh-tunneling" class="section level2">
@@ -149,17 +151,26 @@ $(document).ready(function () {
 <p>Perhaps we may be interested in accessing the work station without using the VPN. This may be particularly useful if we want to transfer files between servers. To do this, we’re going to create an <code>ssh</code> tunnel to the workstation through a publically facing Broad server (e.g. <code>gold.broadinstitute.org</code>). Here are the basic steps–</p>
 <ul>
 <li>Open two terminal windows.</li>
-<li><p>In one terminal window, we’re going to expose the workstation server to port <code>2233</code> like so–</p>
-<pre><code>ssh -L 2233:10.75.108.34:22 BROADUSERNAME@gold.broadinstitute.org</code></pre></li>
+<li><p>In one terminal window, we’re going to expose the workstation server ssh port (<code>22</code>) to a <strong>local port</strong> <code>2233</code> <strong>and</strong> expose the RStudio port (<code>8787</code>) to a <strong>local port</strong> (<code>8788</code>) like so–</p>
+<pre><code>ssh -L 2233:10.75.108.34:22 -L 8788:10.75.108.34:8787 BROADUSERNAME@gold.broadinstitute.org</code></pre></li>
 <li>After password authentication and two-factor authentication, this terminal window will bridge the wortkstation and the currently used computer through port <code>2233</code>. Note: <code>2233</code> was a semi-arbitrary choice on my part. You can realistically do any number of ports, but some (e.g. <code>22</code> are blocked for specific purposes. Unless you know what you’re doing, just stick to <code>2233</code>).</li>
 <li>After setting up the conenction above, minimize this terminal window. It has to be active and running for the subsequent steps to work.</li>
-<li>Now, we can <code>ssh</code> or <code>scp</code> to the workstation using this exposed port (and thus without the need to VPN)</li>
+<li>Now, we can <code>ssh</code> or <code>scp</code> to the workstation using this exposed port (and thus without the need to VPN) using the second terminal window.</li>
 <li><p>To <code>ssh</code>, we have to remove the strict RSA key checking since our login is a dynamic process and point our connection to the exposed port via local host:</p>
-<pre><code>ssh -o StrictHostKeyChecking=no -p 2233 LOCALUSERNAME@localhost</code></pre></li>
+<pre><code>ssh -o StrictHostKeyChecking=no -p 2233 LOCALUSERNAME@localhost</code></pre>
+<p><br> <br></p></li>
 </ul>
 </div>
-<div id="moving-files" class="section level2">
-<h2>Moving Files</h2>
+<div id="accessing-rstudio-wo-vpn" class="section level2">
+<h2>Accessing RStudio w/o VPN</h2>
+<ul>
+<li><p>Since we set up two port forwardings in the first window, we can access RStudio server just by doing the following in our web browser:</p>
+<pre><code>localhost:8788</code></pre>
+<p><br> <br></p></li>
+</ul>
+</div>
+<div id="moving-files-via-ssh-tunneling" class="section level2">
+<h2>Moving Files via ssh tunneling</h2>
 <ul>
 <li><p>Perhaps we want to <code>scp</code> files, such as all the single-cell ATAC <code>bam</code> files. This can be done using the form of the following command:</p>
 <pre><code>scp -o StrictHostKeyChecking=no -P 2233 `find ./ -name &quot;singles*bam&quot;` LOCALUSERNAME@localhost:/home/LOCALUSERNAME/data/</code></pre></li>
@@ -172,25 +183,27 @@ $(document).ready(function () {
 bg</code></pre></li>
 <li>Note: if you want to <code>nohup</code> the file transfer, you’ll also have to have the <code>ssh</code> connection in the background as well (with the <code>-f -N</code> flags in the first command).</li>
 <li>Note: If you do this, then read <a href="http://stackoverflow.com/questions/9447226/how-to-close-this-ssh-tunnel">this</a> discussion on closing out ssh ports.</li>
-<li><p>Note: Again, there’s nothing special about the port number <code>2233</code>. If it’s closed when you try to establish the connection in the first execution, you will get notified that the port is closed. Simply replace <code>2233</code> with some other port number (e.g. <code>2244</code>) that isn’t an obvious one (to avoid overlap).</p></li>
+<li><p>Note: Again, there’s nothing special about the port number <code>2233</code>. If it’s closed when you try to establish the connection in the first execution, you will get notified that the port is closed. Simply replace <code>2233</code> with some other port number (e.g. <code>2244</code>) that isn’t an obvious one (to avoid overlap). <br> <br></p></li>
 </ul>
 </div>
 <div id="important" class="section level2">
 <h2>Important</h2>
 <ul>
-<li><p>You’ll want to close the ssh port before exiting whatever server you’re on. This isn’t a big deal if you ran the port connection in the foreground. However, if you ran it in the background (i.e. the <code>-f -N</code> flags), then you’ll need to kill the connection to make your server access play friendly in the future. From <a href="http://stackoverflow.com/questions/9447226/how-to-close-this-ssh-tunnel">the post linked above</a>, see which connection is responsible for the port connection:</p>
+<li><p>You’ll want to close the ssh port before exiting whatever server you’re on. This isn’t a big deal if you ran the port connection in the foreground (i.e. the commands listed above thus far). However, if you ran it in the background (i.e. the <code>-f -N</code> flags), then you’ll need to kill the connection to make your server access play friendly in the future. From <a href="http://stackoverflow.com/questions/9447226/how-to-close-this-ssh-tunnel">the post linked above</a>, see which connection is responsible for the port connection:</p>
 <pre><code>ps aux | grep 2233</code></pre>
 <p>and then look for the second column that has the <code>pid</code>. Say this number is <code>14651</code>. Close it off using the following:</p>
-<pre><code>kill -9 14651</code></pre></li>
+<pre><code>kill -9 14651</code></pre>
+<p><br> <br></p></li>
 </ul>
 </div>
 <div id="aliases" class="section level2">
 <h2>Aliases</h2>
 <ul>
 <li><p>All of these commands can be added to your <code>.bashrc</code> file under simple commands that will make your life much, much easier. Ask Caleb if you want to do this/don’t know how to do this. For example, we can change the first command that builds the tunnel using the following command:</p>
-<pre><code>echo tunnel2233=&quot;ssh -L 2233:10.75.108.34:22 BROADUSERNAME@gold.broadinstitute.org&quot; &gt;&gt; ~/.bashrc</code></pre>
+<pre><code>echo tunnel2233=&quot;ssh -L 2233:10.75.108.34:22-L 8788:10.75.108.34:8787 BROADUSERNAME@gold.broadinstitute.org&quot; &gt;&gt; ~/.bashrc</code></pre>
 <p>which will allow you to replace the command to tunnel to the server by simply typing <code>tunnel2233</code> rather than the long <code>ssh</code> command.</p></li>
 </ul>
+<p><br> <br> <br> <br></p>
 </div>
 
 
