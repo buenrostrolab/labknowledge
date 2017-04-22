@@ -24,7 +24,6 @@ ssh LOCALUSERNAME@10.75.108.34
 ## Accessing RStudio
 
 - As far as I've been able to figure things out, to access RStudio, you have to be connected to the Broad VPN. Once you are connected, type the following in any web browser to access RStudio on the workstation:
-
 ```
 http://10.75.108.34:8787
 ```
@@ -52,6 +51,7 @@ ssh -o StrictHostKeyChecking=no -p 2233 LOCALUSERNAME@localhost
 ```
 scp -o StrictHostKeyChecking=no -P 2233 `find ./ -name "singles*bam"` LOCALUSERNAME@localhost:/home/LOCALUSERNAME/data/
 ```
+
 An important thing to not here is that the `scp` synatx requires a captial "P" whereas `ssh` uses a lowercase "p" to specify the port.
 
 - Rather than watching all of the files transfer, we may want to throw the command in the background. This way, we can close our windows and do something else. See the discussion [here](https://bharatikunal.wordpress.com/2010/10/20/scp-as-a-background-process/). Thus, the final command that was executed with port `2233` still exposed in another command window was
@@ -76,7 +76,6 @@ kill -9 14651
 
 ## Aliases
 - All of these commands can be added to your `.bashrc` file under simple commands that will make your life much, much easier. Ask Caleb if you want to do this/don't know how to do this. For example, we can change the first command that builds the tunnel using the following command:
-
 ```
 echo tunnel2233="ssh -L 2233:10.75.108.34:22 BROADUSERNAME@gold.broadinstitute.org" >> ~/.bashrc
 ```

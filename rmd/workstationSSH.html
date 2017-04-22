@@ -139,11 +139,9 @@ $(document).ready(function () {
 <div id="accessing-rstudio" class="section level2">
 <h2>Accessing RStudio</h2>
 <ul>
-<li>As far as I’ve been able to figure things out, to access RStudio, you have to be connected to the Broad VPN. Once you are connected, type the following in any web browser to access RStudio on the workstation:</li>
-</ul>
-<pre><code>http://10.75.108.34:8787</code></pre>
-<ul>
-<li>What this means is that RStudio server is available through port <code>8787</code> at the designated IP address of the workstation.</li>
+<li><p>As far as I’ve been able to figure things out, to access RStudio, you have to be connected to the Broad VPN. Once you are connected, type the following in any web browser to access RStudio on the workstation:</p>
+<pre><code>http://10.75.108.34:8787</code></pre></li>
+<li><p>What this means is that RStudio server is available through port <code>8787</code> at the designated IP address of the workstation.</p></li>
 </ul>
 </div>
 <div id="ssh-tunneling" class="section level2">
@@ -164,8 +162,10 @@ $(document).ready(function () {
 <h2>Moving Files</h2>
 <ul>
 <li><p>Perhaps we want to <code>scp</code> files, such as all the single-cell ATAC <code>bam</code> files. This can be done using the form of the following command:</p>
-<pre><code>scp -o StrictHostKeyChecking=no -P 2233 `find ./ -name &quot;singles*bam&quot;` LOCALUSERNAME@localhost:/home/LOCALUSERNAME/data/</code></pre>
-<p>An important thing to not here is that the <code>scp</code> synatx requires a captial “P” whereas <code>ssh</code> uses a lowercase “p” to specify the port.</p></li>
+<pre><code>scp -o StrictHostKeyChecking=no -P 2233 `find ./ -name &quot;singles*bam&quot;` LOCALUSERNAME@localhost:/home/LOCALUSERNAME/data/</code></pre></li>
+</ul>
+<p>An important thing to not here is that the <code>scp</code> synatx requires a captial “P” whereas <code>ssh</code> uses a lowercase “p” to specify the port.</p>
+<ul>
 <li><p>Rather than watching all of the files transfer, we may want to throw the command in the background. This way, we can close our windows and do something else. See the discussion <a href="https://bharatikunal.wordpress.com/2010/10/20/scp-as-a-background-process/">here</a>. Thus, the final command that was executed with port <code>2233</code> still exposed in another command window was</p>
 <pre><code>nohup scp -o StrictHostKeyChecking=no -P 2233 `find ./ -name &quot;singles*.st.bam&quot;` LOCALUSERNAME@localhost:/home/LOCALUSERNAME/data/ &gt; nohub.out 2&gt;&amp;1
 *ctrl + z*
@@ -187,10 +187,10 @@ bg</code></pre></li>
 <div id="aliases" class="section level2">
 <h2>Aliases</h2>
 <ul>
-<li>All of these commands can be added to your <code>.bashrc</code> file under simple commands that will make your life much, much easier. Ask Caleb if you want to do this/don’t know how to do this. For example, we can change the first command that builds the tunnel using the following command:</li>
-</ul>
+<li><p>All of these commands can be added to your <code>.bashrc</code> file under simple commands that will make your life much, much easier. Ask Caleb if you want to do this/don’t know how to do this. For example, we can change the first command that builds the tunnel using the following command:</p>
 <pre><code>echo tunnel2233=&quot;ssh -L 2233:10.75.108.34:22 BROADUSERNAME@gold.broadinstitute.org&quot; &gt;&gt; ~/.bashrc</code></pre>
-<p>which will allow you to replace the command to tunnel to the server by simply typing <code>tunnel2233</code> rather than the long <code>ssh</code> command.</p>
+<p>which will allow you to replace the command to tunnel to the server by simply typing <code>tunnel2233</code> rather than the long <code>ssh</code> command.</p></li>
+</ul>
 </div>
 
 
